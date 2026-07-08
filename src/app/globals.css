@@ -10,6 +10,21 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* ---- Paleta P&G Decants ---- */
+  --color-brand-black: #100D0A;
+  --color-brand-cream: #F8F4EC;
+  --color-brand-gold: #C6A15B;
+  --color-brand-gold-dark: #8C6D2F;
+  --color-brand-taupe: #8A8378;
+  --color-brand-beige-line: #EAE3D5;
+  --color-brand-text-muted: #6B6459;
+  --color-brand-text-dark: #3A342C;
+  --color-brand-white: #FFFFFF;
+
+  /* ---- Tipografías P&G Decants ---- */
+  --font-display: var(--font-cormorant);
+  --font-body: var(--font-montserrat);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,7 +35,58 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-brand-cream);
+  color: var(--color-brand-text-dark);
+  font-family: var(--font-body), sans-serif;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+/* NProgress - barra de carga con estilo de marca */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: var(--color-brand-gold);
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+}
+
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px var(--color-brand-gold), 0 0 5px var(--color-brand-gold);
+  opacity: 1;
+  transform: rotate(3deg) translate(0px, -4px);
 }

@@ -1,65 +1,90 @@
-import Image from "next/image";
+import { db } from '@/db';
+import { topBarMessages, heroSlides, products, productImages, variants, animatedBannerMessages, trustBadges } from '@/db/schema';
+import { eq, and, sql } from 'drizzle-orm';
+import { TopBar } from '@/components/layout/TopBar';
+import { Header } from '@/components/layout/Header';
+import { HeroCarousel } from '@/components/home/HeroCarousel';
+import { AnimatedBanner } from '@/components/home/AnimatedBanner';
+import { TrustBadges } from '@/components/home/TrustBadges';
+import { getNewArrivals } from '@/db/queries/products';
+import { NewArrivalsCarousel } from '@/components/home/NewArrivalsCarousel';
+import { SearchTodaySection } from '@/components/home/SearchTodaySection';
+import { BestSellersCarousel } from '@/components/home/BestSellersCarousel';
+import { Footer } from '@/components/layout/Footer';
 
-export default function Home() {
+export default async function Home() {
+   const messages = await db
+    .select({ id: topBarMessages.id, message: topBarMessages.message })
+    .from(topBarMessages)
+    .where(eq(topBarMessages.isActive, true))
+    .orderBy(topBarMessages.displayOrder);
+
+    const newArrivals = await getNewArrivals();
+
+    const badges = await db
+    .select()
+    .from(trustBadges)
+    .where(eq(trustBadges.isActive, true))
+    .orderBy(trustBadges.displayOrder);
+
+  const slides = await db
+    .select()
+    .from(heroSlides)
+    .where(eq(heroSlides.isActive, true))
+    .orderBy(heroSlides.displayOrder);
+
+  const bannerMessages = await db
+    .select({ id: animatedBannerMessages.id, message: animatedBannerMessages.message })
+    .from(animatedBannerMessages)
+    .where(eq(animatedBannerMessages.isActive, true))
+    .orderBy(animatedBannerMessages.displayOrder);
+
+  // Productos destacados con su imagen principal, una segunda imagen (hover) y precio mínimo
+  const featuredProductsRaw = await db
+    .select({
+      id: products.id,
+      name: products.name,
+      slug: products.slug,
+    })
+    .from(products)
+    .where(and(eq(products.isFeatured, true), eq(products.isActive, true)));
+
+  const featuredProducts = await Promise.all(
+    featuredProductsRaw.map(async (product) => {
+      const images = await db
+        .select({ imageUrl: productImages.imageUrl, isMain: productImages.isMain })
+        .from(productImages)
+        .where(eq(productImages.productId, product.id))
+        .orderBy(productImages.displayOrder);
+
+      const [minPriceResult] = await db
+        .select({ minPrice: sql<string>`MIN(${variants.price})` })
+        .from(variants)
+        .where(eq(variants.productId, product.id));
+
+      const mainImage = images.find((img) => img.isMain)?.imageUrl ?? images[0]?.imageUrl ?? '';
+      const hoverImage = images.find((img) => !img.isMain)?.imageUrl ?? null;
+
+      return {
+        ...product,
+        mainImage,
+        hoverImage,
+        minPrice: minPriceResult?.minPrice ?? '0',
+      };
+    })
+  );
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="flex flex-col flex-1 w-full min-w-0">
+      <TopBar messages={messages} />
+      <Header />
+      <HeroCarousel slides={slides} />
+      <AnimatedBanner messages={bannerMessages} />
+      <TrustBadges badges={badges} /> 
+      <SearchTodaySection />
+      <BestSellersCarousel products={featuredProducts} />
+      <NewArrivalsCarousel products={newArrivals} />
+      <Footer />
+    </main>
   );
 }
