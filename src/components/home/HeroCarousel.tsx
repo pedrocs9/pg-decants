@@ -29,7 +29,7 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
   const goTo = (index: number) => setCurrent(index);
 
   return (
-    <div className="relative w-full h-[60vh] min-h-[380px] max-h-[600px] overflow-hidden">
+    <div className="relative w-full h-[75vh] min-h-[380px] max-h-[600px] overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={slide.id}

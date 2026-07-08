@@ -24,11 +24,11 @@ export function TopBar({ messages }: { messages: TopBarMessage[] }) {
   const goNext = () => setCurrent((prev) => (prev + 1) % messages.length);
 
  return (
-    <div className="relative bg-brand-black text-brand-cream text-sm py-2 px-12 flex items-center justify-center">
+    <div className="relative bg-brand-cream text-brand-text-dark text-sm py-2 px-12 flex items-center justify-center border-b border-brand-beige-line">
       <button
         onClick={goPrev}
         aria-label="Mensaje anterior"
-        className="absolute left-4 cursor-pointer hover:text-brand-gold transition-colors"
+        className="absolute left-4 cursor-pointer hover:text-brand-gold-dark transition-colors"
       >
         ‹
       </button>
@@ -38,7 +38,7 @@ export function TopBar({ messages }: { messages: TopBarMessage[] }) {
       <button
         onClick={goNext}
         aria-label="Mensaje siguiente"
-        className="absolute right-4 cursor-pointer hover:text-brand-gold transition-colors"
+        className="absolute right-4 cursor-pointer hover:text-brand-gold-dark transition-colors"
       >
         ›
       </button>
