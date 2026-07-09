@@ -11,22 +11,28 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    if (body.type === 'payment') {
+    if (body.type === "payment") {
       const payment = new Payment(client);
       const paymentData = await payment.get({ id: body.data.id });
 
       const orderId = Number(paymentData.external_reference);
       if (!orderId) return NextResponse.json({ received: true });
 
-      if (paymentData.status === 'approved') {
+      if (paymentData.status === "approved") {
         await db
           .update(orders)
-          .set({ status: 'pagado', stripePaymentIntentId: String(paymentData.id) })
+          .set({
+            status: "pagado",
+            stripePaymentIntentId: String(paymentData.id),
+          })
           .where(eq(orders.id, orderId));
 
         // Descontar stock de cada variante comprada
-       const items = await db
-          .select({ variantId: orderItems.variantId, quantity: orderItems.quantity })
+        const items = await db
+          .select({
+            variantId: orderItems.variantId,
+            quantity: orderItems.quantity,
+          })
           .from(orderItems)
           .where(eq(orderItems.orderId, orderId));
 
@@ -49,6 +55,7 @@ export async function POST(request: NextRequest) {
             city: addresses.city,
             region: addresses.region,
             userId: orders.userId,
+            phone: addresses.phone,
           })
           .from(orders)
           .innerJoin(addresses, eq(orders.addressId, addresses.id))
@@ -56,7 +63,10 @@ export async function POST(request: NextRequest) {
 
         let customerEmail: string | null = null;
         if (orderWithAddress.userId) {
-          const [user] = await db.select({ email: usersTable.email }).from(usersTable).where(eq(usersTable.id, orderWithAddress.userId));
+          const [user] = await db
+            .select({ email: usersTable.email })
+            .from(usersTable)
+            .where(eq(usersTable.id, orderWithAddress.userId));
           customerEmail = user?.email ?? null;
         } else if (paymentData.payer?.email) {
           customerEmail = paymentData.payer.email;
@@ -79,6 +89,7 @@ export async function POST(request: NextRequest) {
             to: customerEmail,
             orderId: orderWithAddress.id,
             customerName: orderWithAddress.fullName,
+            customerPhone: orderWithAddress.phone, // agregar
             items: emailItems,
             subtotal: orderWithAddress.subtotal,
             shippingTotal: orderWithAddress.shippingTotal,
@@ -88,25 +99,35 @@ export async function POST(request: NextRequest) {
               city: orderWithAddress.city,
               region: orderWithAddress.region,
             },
+            paymentMethod: "Mercado Pago", // agregar
           });
         }
 
         // Limpiar el carrito del usuario (si estaba logueado)
-        const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
+        const [order] = await db
+          .select()
+          .from(orders)
+          .where(eq(orders.id, orderId));
         if (order.userId) {
-          const [cart] = await db.select().from(carts).where(eq(carts.userId, order.userId));
+          const [cart] = await db
+            .select()
+            .from(carts)
+            .where(eq(carts.userId, order.userId));
           if (cart) {
             await db.delete(cartItems).where(eq(cartItems.cartId, cart.id));
           }
         }
-      } else if (paymentData.status === 'rejected') {
-        await db.update(orders).set({ status: 'cancelado' }).where(eq(orders.id, orderId));
+      } else if (paymentData.status === "rejected") {
+        await db
+          .update(orders)
+          .set({ status: "cancelado" })
+          .where(eq(orders.id, orderId));
       }
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Error en webhook de Mercado Pago:', error);
-    return NextResponse.json({ error: 'Webhook error' }, { status: 500 });
+    console.error("Error en webhook de Mercado Pago:", error);
+    return NextResponse.json({ error: "Webhook error" }, { status: 500 });
   }
 }

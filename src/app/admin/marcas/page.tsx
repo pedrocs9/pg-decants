@@ -21,6 +21,7 @@ export default function BrandsPage() {
   const [editForm, setEditForm] = useState(emptyForm);
 
   async function refresh() { setBrands(await getBrands()); }
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { refresh(); }, []);
 
   async function handleCreate(e: React.FormEvent) {

@@ -11,6 +11,7 @@ import { ProductCard } from '@/components/catalog/ProductCard';
 import { getProductBySlug, getRelatedProducts } from '@/db/queries/products';
 import { ProductReviews } from '@/components/product/ProductReviews';
 import { WishlistButton } from '@/components/product/WishlistButton';
+import { FamilyChips, NoteChips, SeasonChips } from '@/components/product/ProductAttributes';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -112,25 +113,23 @@ export default async function ProductPage({
               <span className="text-brand-text-muted">Tipo</span>
               <span className="text-brand-text-dark">{typeLabels[product.perfumeType]}</span>
 
-              {product.families.length > 0 && (
-                <>
-                  <span className="text-brand-text-muted">Familia Olfativa</span>
-                  <span className="text-brand-text-dark">{product.families.join(', ')}</span>
-                </>
+             {product.families.length > 0 && (
+                <div className="flex items-start gap-4 py-3 border-b border-brand-beige-line">
+                  <span className="text-xs text-brand-gold-dark uppercase tracking-wide w-32 flex-shrink-0 pt-1.5">Familia Olfativa</span>
+                  <FamilyChips families={product.families} />
+                </div>
               )}
-
               {product.notes.length > 0 && (
-                <>
-                  <span className="text-brand-text-muted">Notas</span>
-                  <span className="text-brand-text-dark">{product.notes.join(', ')}</span>
-                </>
+                <div className="flex items-start gap-4 py-3 border-b border-brand-beige-line">
+                  <span className="text-xs text-brand-gold-dark uppercase tracking-wide w-32 flex-shrink-0 pt-1.5">Notas</span>
+                  <NoteChips notes={product.notes} />
+                </div>
               )}
-
               {product.seasons.length > 0 && (
-                <>
-                  <span className="text-brand-text-muted">Temporada</span>
-                  <span className="text-brand-text-dark">{product.seasons.join(', ')}</span>
-                </>
+                <div className="flex items-start gap-4 py-3 border-b border-brand-beige-line">
+                  <span className="text-xs text-brand-gold-dark uppercase tracking-wide w-32 flex-shrink-0 pt-1.5">Temporada</span>
+                  <SeasonChips seasons={product.seasons} />
+                </div>
               )}
             </div>
           </div>

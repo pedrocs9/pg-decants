@@ -79,8 +79,7 @@ type ProductInput = {
   isFeatured: boolean;
   isActive: boolean;
   images: { imageUrl: string; isMain: boolean }[];
-  variants: { sizeMl: number; price: string; stock: number; availability: 'disponible' | 'agotado' | 'por_encargo'; sku: string }[];
-  familyIds: number[];
+variants: { id?: number; sizeMl: number; price: string; stock: number; availability: 'disponible' | 'agotado' | 'por_encargo'; sku: string }[];  familyIds: number[];
   noteIds: number[];
   seasonIds: number[];
 };
@@ -113,13 +112,15 @@ export async function saveProduct(id: number | null, data: ProductInput) {
     await db.delete(productOlfactoryNotes).where(eq(productOlfactoryNotes.productId, productId));
     await db.delete(productSeasons).where(eq(productSeasons.productId, productId));
 
-    // Variantes: manejo cuidadoso porque pueden estar referenciadas en pedidos
     const existingVariants = await db.select().from(variants).where(eq(variants.productId, productId));
+    const existingIds = existingVariants.map((v) => v.id);
 
+    // IDs que vienen del form (variantes que ya existían)
+    const incomingIds = data.variants.filter((v) => v.id).map((v) => v.id as number);
+
+    // Eliminar variantes que ya no están en el form
     for (const existing of existingVariants) {
-      const stillExists = data.variants.some((v) => v.sku === existing.sku);
-      if (!stillExists) {
-        // Intenta borrar; si tiene pedidos asociados, la desactivamos en vez de borrarla
+      if (!incomingIds.includes(existing.id)) {
         try {
           await db.delete(variants).where(eq(variants.id, existing.id));
         } catch {
@@ -129,14 +130,18 @@ export async function saveProduct(id: number | null, data: ProductInput) {
     }
 
     for (const v of data.variants) {
-      const existing = existingVariants.find((ev) => ev.sku === v.sku);
-      if (existing) {
+      if (v.id && existingIds.includes(v.id)) {
+        // Actualizar variante existente
         await db
           .update(variants)
           .set({ sizeMl: v.sizeMl, price: v.price, stock: v.stock, availability: v.availability })
-          .where(eq(variants.id, existing.id));
+          .where(eq(variants.id, v.id));
       } else {
-        await db.insert(variants).values({ productId, sizeMl: v.sizeMl, price: v.price, stock: v.stock, availability: v.availability, sku: v.sku });
+        // Insertar variante nueva — generar SKU si viene vacío
+        const sku = v.sku?.trim()
+          ? v.sku.trim()
+          : `${data.slug}-${v.sizeMl}ml-${Date.now()}`;
+        await db.insert(variants).values({ productId, sizeMl: v.sizeMl, price: v.price, stock: v.stock, availability: v.availability, sku });
       }
     }
   } else {

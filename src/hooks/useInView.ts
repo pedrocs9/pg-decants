@@ -10,12 +10,19 @@ export function useInView(options?: IntersectionObserverInit) {
     const el = ref.current;
     if (!el) return;
 
+    // Chequea si ya está visible al montar
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) {
+      setInView(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setInView(true);
-        observer.disconnect(); // Solo anima una vez
+        observer.disconnect();
       }
-    }, { threshold: 0.15, ...options });
+    }, { threshold: 0, rootMargin: '0px 0px -50px 0px', ...options });
 
     observer.observe(el);
     return () => observer.disconnect();

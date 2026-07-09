@@ -1,3 +1,5 @@
+'use client';
+
 import { AnimateIn } from '@/components/ui/AnimateIn';
 const testimonials = [
   {
@@ -62,9 +64,7 @@ export function Testimonials() {
                   className="bg-brand-white border border-brand-beige-line p-6 flex flex-col gap-4 hover:border-brand-gold/40 hover:shadow-md transition-all duration-300"
                 >
                   <Stars count={t.rating} />
-                  <p className="text-sm text-brand-text-dark leading-relaxed flex-1">
-                    "{t.text}"
-                  </p>
+                <p className="text-sm text-brand-text-dark leading-relaxed flex-1">&ldquo;{t.text}&rdquo;</p>
                   <div className="border-t border-brand-beige-line pt-4">
                     <p className="text-sm font-medium text-brand-text-dark">
                       {t.name}

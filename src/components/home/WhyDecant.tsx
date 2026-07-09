@@ -1,3 +1,5 @@
+'use client';
+
 import { AnimateIn } from '@/components/ui/AnimateIn';
 
 const reasons = [

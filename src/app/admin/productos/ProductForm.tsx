@@ -8,8 +8,7 @@ type Brand = { id: number; name: string };
 type FamilyOrNote = { id: number; name: string };
 
 type ImageInput = { imageUrl: string; isMain: boolean };
-type VariantInput = { sizeMl: number; price: string; stock: number; availability: 'disponible' | 'agotado' | 'por_encargo'; sku: string };
-
+type VariantInput = { id?: number; sizeMl: number; price: string; stock: number; availability: 'disponible' | 'agotado' | 'por_encargo'; sku: string };
 type ProductData = {
   id?: number;
   name: string;

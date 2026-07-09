@@ -189,20 +189,20 @@ export async function getProductBySlug(slug: string) {
     .where(eq(variants.productId, product.id))
     .orderBy(variants.sizeMl);
 
-  const familyRows = await db
-    .select({ name: olfactoryFamilies.name })
+    const familyRows = await db
+    .selectDistinct({ name: olfactoryFamilies.name })
     .from(productOlfactoryFamilies)
     .innerJoin(olfactoryFamilies, eq(productOlfactoryFamilies.olfactoryFamilyId, olfactoryFamilies.id))
     .where(eq(productOlfactoryFamilies.productId, product.id));
 
   const noteRows = await db
-    .select({ name: olfactoryNotes.name })
+    .selectDistinct({ name: olfactoryNotes.name })
     .from(productOlfactoryNotes)
     .innerJoin(olfactoryNotes, eq(productOlfactoryNotes.olfactoryNoteId, olfactoryNotes.id))
     .where(eq(productOlfactoryNotes.productId, product.id));
 
   const seasonRows = await db
-    .select({ name: seasons.name })
+    .selectDistinct({ name: seasons.name })
     .from(productSeasons)
     .innerJoin(seasons, eq(productSeasons.seasonId, seasons.id))
     .where(eq(productSeasons.productId, product.id));

@@ -2,32 +2,31 @@
 
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { db } from '@/db';
-import { cartItems, variants, products, orders, orderItems, addresses, shippingConfig, carts } from '@/db/schema';
+import { cartItems, variants, products, orders, orderItems, addresses, carts } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { cookies } from 'next/headers';
-import { checkoutSchema } from '@/lib/validations';
+import { REGIONS, SHIPPING_ZONES, getZoneByRegionCode } from '@/lib/chile-regions';
 
 const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN! });
 
 const CART_COOKIE = 'pg_decants_cart_id';
+const FREE_THRESHOLD = 20000;
 
 type CheckoutFormData = {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
+  rut?: string;
   street: string;
-  city: string;
-  region: string;
+  apartment?: string;
+  regionCode: string;
+  comuna: string;
   postalCode?: string;
 };
 
 export async function createCheckoutPreference(formData: CheckoutFormData) {
-  const parsed = checkoutSchema.safeParse(formData);
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0].message };
-  }
-
   const session = await auth();
   const cookieStore = await cookies();
 
@@ -39,9 +38,7 @@ export async function createCheckoutPreference(formData: CheckoutFormData) {
     cartId = cookieStore.get(CART_COOKIE)?.value;
   }
 
-  if (!cartId) {
-    return { error: 'No se encontró tu carrito.' };
-  }
+  if (!cartId) return { error: 'No se encontró tu carrito.' };
 
   const items = await db
     .select({
@@ -57,9 +54,7 @@ export async function createCheckoutPreference(formData: CheckoutFormData) {
     .innerJoin(products, eq(variants.productId, products.id))
     .where(eq(cartItems.cartId, cartId));
 
-  if (items.length === 0) {
-    return { error: 'Tu carrito está vacío.' };
-  }
+  if (items.length === 0) return { error: 'Tu carrito está vacío.' };
 
   for (const item of items) {
     if (item.quantity > item.stock) {
@@ -69,20 +64,26 @@ export async function createCheckoutPreference(formData: CheckoutFormData) {
 
   const subtotal = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
 
-  const [shipping] = await db.select().from(shippingConfig).where(eq(shippingConfig.isActive, true));
-  const freeThreshold = shipping?.freeShippingThreshold ? Number(shipping.freeShippingThreshold) : null;
-  const shippingCost = freeThreshold && subtotal >= freeThreshold ? 0 : Number(shipping?.flatRate ?? 0);
-
+  // Tarifa por zona geográfica
+  const zone = getZoneByRegionCode(formData.regionCode);
+  const zoneInfo = SHIPPING_ZONES[zone];
+  const shippingCost = subtotal >= FREE_THRESHOLD ? 0 : zoneInfo.price;
   const total = subtotal + shippingCost;
+
+  const street = formData.apartment
+    ? `${formData.street}, ${formData.apartment}`
+    : formData.street;
+
+  const regionName = REGIONS.find((r) => r.code === formData.regionCode)?.name ?? formData.regionCode;
 
   const [address] = await db
     .insert(addresses)
     .values({
       userId: session?.user?.id ?? null,
-      fullName: formData.fullName,
-      street: formData.street,
-      city: formData.city,
-      region: formData.region,
+      fullName: `${formData.firstName} ${formData.lastName}`.trim(),
+      street,
+      city: formData.comuna,
+      region: regionName,
       postalCode: formData.postalCode,
       phone: formData.phone,
     })
@@ -123,7 +124,7 @@ export async function createCheckoutPreference(formData: CheckoutFormData) {
   if (shippingCost > 0) {
     mpItems.push({
       id: 'shipping',
-      title: 'Envío',
+      title: `Envío — ${zoneInfo.label}`,
       quantity: 1,
       unit_price: shippingCost,
       currency_id: 'CLP',
@@ -134,7 +135,7 @@ export async function createCheckoutPreference(formData: CheckoutFormData) {
     body: {
       items: mpItems,
       payer: {
-        name: formData.fullName,
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
         email: formData.email,
       },
       external_reference: String(order.id),
@@ -152,11 +153,8 @@ export async function createCheckoutPreference(formData: CheckoutFormData) {
 }
 
 export async function getShippingInfo(subtotal: number) {
-  const [shipping] = await db.select().from(shippingConfig).where(eq(shippingConfig.isActive, true));
-  if (!shipping) return { cost: 0, freeThreshold: null };
-
-  const freeThreshold = shipping.freeShippingThreshold ? Number(shipping.freeShippingThreshold) : null;
-  const cost = freeThreshold && subtotal >= freeThreshold ? 0 : Number(shipping.flatRate);
-
-  return { cost, freeThreshold };
+  return {
+    cost: subtotal >= FREE_THRESHOLD ? 0 : null,
+    freeThreshold: FREE_THRESHOLD,
+  };
 }

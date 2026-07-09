@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-
+import { AnimateIn } from '@/components/ui/AnimateIn';
 type Brand = { id: number; name: string; slug: string; logoUrl: string | null };
 
 export function BrandsCarousel({ brands }: { brands: Brand[] }) {
@@ -16,14 +16,16 @@ export function BrandsCarousel({ brands }: { brands: Brand[] }) {
 
   return (
     <section className="py-16 bg-brand-white border-y border-brand-beige-line overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-        <h2 className="font-display italic text-3xl text-brand-text-dark text-center">
-          Marcas que trabajamos
-        </h2>
-        <p className="text-brand-text-muted text-center text-sm mt-2">
-          Decants 100% originales de las mejores casas de perfumería
-        </p>
-      </div>
+        <AnimateIn animation="fade-up">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+            <h2 className="font-display italic text-3xl text-brand-text-dark text-center">
+              Marcas que trabajamos
+            </h2>
+            <p className="text-brand-text-muted text-center text-sm mt-2">
+              Decants 100% originales de las mejores casas de perfumería
+            </p>
+          </div>
+        </AnimateIn>
 
       {/* Carrusel con scroll automático CSS */}
       <div className="relative">

@@ -5,7 +5,7 @@ import { useInView } from '@/hooks/useInView';
 type Props = {
   children: React.ReactNode;
   className?: string;
-  delay?: number; // en ms
+  delay?: number;
   animation?: 'fade-up' | 'fade-in' | 'pop';
 };
 
@@ -17,8 +17,10 @@ export function AnimateIn({ children, className = '', delay = 0, animation = 'fa
       ref={ref}
       className={className}
       style={{
-        opacity: 0,
-        animation: inView ? `${animation} 0.6s ease ${delay}ms forwards` : 'none',
+        opacity: inView ? undefined : 0,
+        animation: inView
+          ? `${animation} 0.6s ease ${delay}ms both`
+          : 'none',
       }}
     >
       {children}
