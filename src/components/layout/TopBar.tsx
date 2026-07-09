@@ -9,6 +9,7 @@ type TopBarMessage = {
 
 export function TopBar({ messages }: { messages: TopBarMessage[] }) {
   const [current, setCurrent] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (messages.length <= 1) return;
@@ -18,13 +19,26 @@ export function TopBar({ messages }: { messages: TopBarMessage[] }) {
     return () => clearInterval(interval);
   }, [messages.length]);
 
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 12);
+    }
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   if (messages.length === 0) return null;
 
   const goPrev = () => setCurrent((prev) => (prev - 1 + messages.length) % messages.length);
   const goNext = () => setCurrent((prev) => (prev + 1) % messages.length);
 
- return (
-    <div className="relative bg-brand-cream text-brand-text-dark text-sm py-2 px-12 flex items-center justify-center border-b border-brand-beige-line">
+  return (
+    <div
+      className={`fixed top-0 inset-x-0 z-50 bg-brand-cream text-brand-text-dark text-sm h-10 flex items-center justify-center px-12 border-b border-brand-beige-line transition-transform duration-300 ${
+        scrolled ? '-translate-y-full' : 'translate-y-0'
+      }`}
+    >
       <button
         onClick={goPrev}
         aria-label="Mensaje anterior"

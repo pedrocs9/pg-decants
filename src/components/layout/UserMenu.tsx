@@ -27,7 +27,7 @@ export function UserMenu() {
 
   return (
     <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-      <button className="text-brand-text-dark hover:text-brand-gold-dark transition-colors cursor-pointer">
+      <button className="text-brand-gold hover:text-brand-gold-dark transition-colors cursor-pointer">
         <UserIcon className="w-5 h-5" />
       </button>
 

@@ -64,7 +64,7 @@ export function SearchModal() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Buscar"
-        className="text-brand-text-dark hover:text-brand-gold-dark transition-colors cursor-pointer"
+        className="text-brand-gold hover:text-brand-gold-dark transition-colors cursor-pointer"
       >
         <SearchIcon className="w-5 h-5" />
       </button>
