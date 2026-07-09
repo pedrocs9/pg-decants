@@ -8,8 +8,12 @@ import { AnimatedBanner } from '@/components/home/AnimatedBanner';
 import { TrustBadges } from '@/components/home/TrustBadges';
 import { getNewArrivals } from '@/db/queries/products';
 import { NewArrivalsCarousel } from '@/components/home/NewArrivalsCarousel';
-import { SearchTodaySection } from '@/components/home/SearchTodaySection';
+import { HowItWorks } from '@/components/home/HowItWorks';
+import { WhyDecant } from '@/components/home/WhyDecant';
+import { Testimonials } from '@/components/home/Testimonials';
 import { BestSellersCarousel } from '@/components/home/BestSellersCarousel';
+import { BrandsCarousel } from '@/components/home/BrandsCarousel';
+import { brands } from '@/db/schema';
 import { Footer } from '@/components/layout/Footer';
 
 export default async function Home() {
@@ -32,6 +36,12 @@ export default async function Home() {
     .from(heroSlides)
     .where(eq(heroSlides.isActive, true))
     .orderBy(heroSlides.displayOrder);
+
+    const featuredBrands = await db
+    .select({ id: brands.id, name: brands.name, slug: brands.slug, logoUrl: brands.logoUrl })
+    .from(brands)
+    .where(eq(brands.isFeatured, true))
+    .orderBy(brands.name);
 
   const bannerMessages = await db
     .select({ id: animatedBannerMessages.id, message: animatedBannerMessages.message })
@@ -57,8 +67,11 @@ export default async function Home() {
         .where(eq(productImages.productId, product.id))
         .orderBy(productImages.displayOrder);
 
-      const [minPriceResult] = await db
-        .select({ minPrice: sql<string>`MIN(${variants.price})` })
+      const [priceResult] = await db
+        .select({
+          minPrice: sql<string>`MIN(${variants.price})`,
+          maxPrice: sql<string>`MAX(${variants.price})`,
+        })
         .from(variants)
         .where(eq(variants.productId, product.id));
 
@@ -69,7 +82,8 @@ export default async function Home() {
         ...product,
         mainImage,
         hoverImage,
-        minPrice: minPriceResult?.minPrice ?? '0',
+        minPrice: priceResult?.minPrice ?? '0',
+        maxPrice: priceResult?.maxPrice ?? '0',
       };
     })
   );
@@ -80,10 +94,13 @@ export default async function Home() {
       <Header />
       <HeroCarousel slides={slides} />
       <AnimatedBanner messages={bannerMessages} />
-      <TrustBadges badges={badges} /> 
-      <SearchTodaySection />
+      <TrustBadges badges={badges} />
+      <HowItWorks />
       <BestSellersCarousel products={featuredProducts} />
+      <BrandsCarousel brands={featuredBrands} />
       <NewArrivalsCarousel products={newArrivals} />
+      <WhyDecant />
+      <Testimonials />
       <Footer />
     </main>
   );
