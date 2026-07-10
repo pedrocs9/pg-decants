@@ -41,7 +41,7 @@ function ProductCard({ product }: { product: Product }) {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <div className="flex-shrink-0 w-64 sm:w-72 group relative">
+    <div className="flex-shrink-0 w-64 sm:w-72 group relative bg-brand-white ring-1 ring-brand-beige-line hover:ring-brand-gold/40 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl">
       {/* Botón favorito */}
       <div className="absolute top-3 right-3 z-10">
         <WishlistButton productId={product.id} />
@@ -53,7 +53,7 @@ function ProductCard({ product }: { product: Product }) {
         onMouseLeave={() => setHovered(false)}
       >
         {/* Imagen */}
-        <div className="relative h-80 bg-brand-white overflow-hidden">
+        <div className="relative h-80 bg-brand-white overflow-hidden shadow-md group-hover:shadow-xl transition-shadow duration-300">
           {product.mainImage ? (
             <Image
               src={hovered && product.hoverImage ? product.hoverImage : product.mainImage}
@@ -71,7 +71,7 @@ function ProductCard({ product }: { product: Product }) {
         </div>
 
         {/* Info */}
-        <div className="pt-4 pb-1">
+        <div className="pt-4 pb-4 px-4">
           <p className="text-xs text-brand-text-muted uppercase tracking-widest mb-1">Decant</p>
           <p className="text-sm text-brand-text-dark uppercase tracking-wide font-medium group-hover:text-brand-gold-dark transition-colors">
             {product.name}
