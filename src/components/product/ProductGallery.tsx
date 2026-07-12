@@ -21,7 +21,7 @@ export function ProductGallery({ images, productName }: { images: Img[]; product
   }
 
   return (
-    <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[88px_minmax(0,1fr)] lg:items-start">
+    <div className="mx-auto flex w-full max-w-[520px] flex-col gap-4 lg:grid lg:max-w-none lg:grid-cols-[88px_minmax(0,1fr)] lg:items-start">
       {images.length > 1 && (
         <div className="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:max-h-[680px] lg:flex-col lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0">
           {images.map((img, index) => {

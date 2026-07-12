@@ -251,7 +251,7 @@ export function VariantSelector({ variants }: { variants: Variant[] }) {
               onClick={() => setQuantity((current) => Math.max(1, current - 1))}
               disabled={!selected || quantity <= 1}
               aria-label="Disminuir cantidad"
-              className="grid h-12 w-12 place-items-center text-lg text-brand-text-dark transition-colors hover:bg-brand-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold disabled:cursor-not-allowed disabled:opacity-35"
+              className="grid h-12 w-12 flex-shrink-0 place-items-center text-lg text-brand-text-dark transition-colors hover:bg-brand-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold disabled:cursor-not-allowed disabled:opacity-35"
             >
               -
             </button>
@@ -274,7 +274,7 @@ export function VariantSelector({ variants }: { variants: Variant[] }) {
               onClick={() => setQuantity((current) => Math.min(maxQuantity, current + 1))}
               disabled={!selected || isSoldOut || quantity >= maxQuantity}
               aria-label="Aumentar cantidad"
-              className="grid h-12 w-12 place-items-center text-lg text-brand-text-dark transition-colors hover:bg-brand-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold disabled:cursor-not-allowed disabled:opacity-35"
+              className="grid h-12 w-12 flex-shrink-0 place-items-center text-lg text-brand-text-dark transition-colors hover:bg-brand-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold disabled:cursor-not-allowed disabled:opacity-35"
             >
               +
             </button>
