@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AnimateIn } from '@/components/ui/AnimateIn';
+
 type Brand = { id: number; name: string; slug: string; logoUrl: string | null };
 
 export function BrandsCarousel({ brands }: { brands: Brand[] }) {
@@ -11,47 +12,46 @@ export function BrandsCarousel({ brands }: { brands: Brand[] }) {
 
   if (brands.length === 0) return null;
 
-  // Duplicamos para efecto infinito visual
   const doubled = [...brands, ...brands];
 
   return (
-    <section className="py-16 bg-brand-white border-y border-brand-beige-line overflow-hidden">
-        <AnimateIn animation="fade-up">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-            <h2 className="font-display italic text-3xl text-brand-text-dark text-center">
-              Marcas que trabajamos
-            </h2>
-            <p className="text-brand-text-muted text-center text-sm mt-2">
-              Decants 100% originales de las mejores casas de perfumería
-            </p>
-          </div>
-        </AnimateIn>
+    <section className="overflow-hidden border-y border-brand-beige-line bg-brand-white/70 py-14 sm:py-16 lg:py-[4.5rem]">
+      <AnimateIn animation="fade-up">
+        <div className="mx-auto mb-8 max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-brand-gold-dark">Casas seleccionadas</p>
+          <h2 className="font-display italic text-3xl text-brand-text-dark sm:text-4xl">
+            Marcas que trabajamos
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-brand-text-muted">
+            Decants 100% originales de las mejores casas de perfumeria
+          </p>
+        </div>
+      </AnimateIn>
 
-      {/* Carrusel con scroll automático CSS */}
       <div className="relative">
         <div
           ref={scrollRef}
-          className="flex gap-8 animate-brands-scroll"
+          className="flex gap-4 animate-brands-scroll motion-reduce:animate-none sm:gap-5"
           style={{ width: 'max-content' }}
         >
           {doubled.map((brand, i) => (
             <Link
               key={`${brand.id}-${i}`}
               href={`/decants?marca=${brand.slug}`}
-              className="group flex-shrink-0 w-36 h-24 border border-brand-beige-line bg-brand-cream flex items-center justify-center px-4 hover:border-brand-gold hover:shadow-md transition-all duration-300"
+              className="group flex h-[5.5rem] w-[8.5rem] flex-shrink-0 items-center justify-center border border-brand-beige-line bg-brand-cream px-4 transition-colors duration-300 hover:border-brand-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold sm:h-24 sm:w-40"
             >
               {brand.logoUrl ? (
-                <div className="relative w-full h-full">
+                <div className="relative h-full w-full">
                   <Image
                     src={brand.logoUrl}
                     alt={brand.name}
                     fill
-                    className="object-contain p-3 filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    className="object-contain p-4 grayscale opacity-75 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 motion-reduce:transition-none"
                     unoptimized
                   />
                 </div>
               ) : (
-                <span className="text-sm font-medium text-brand-text-muted group-hover:text-brand-gold transition-colors text-center">
+                <span className="text-center text-sm font-medium text-brand-text-muted transition-colors group-hover:text-brand-gold-dark">
                   {brand.name}
                 </span>
               )}

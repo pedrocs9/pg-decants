@@ -23,6 +23,12 @@
   --color-brand-text-muted: #6B6459;
   --color-brand-text-dark: #3A342C;
   --color-brand-white: #FFFFFF;
+  --content-max: 1280px;
+  --topbar-height: 30px;
+  --header-height: 72px;
+  --header-height-mobile: 62px;
+  --transition-standard: 280ms;
+  --header-shadow: 0 1px 0 rgba(198, 161, 91, 0.12);
 
   /* ---- Tipografías P&G Decants ---- */
   --font-display: var(--font-cormorant);
@@ -90,6 +96,19 @@ body {
 
 .animate-marquee {
   animation: marquee 25s linear infinite;
+}
+
+.animate-marquee-slow {
+  animation: marquee 42s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-slow,
+  .animate-brands-scroll {
+    animation: none;
+    transform: none;
+  }
 }
 
 /* NProgress */

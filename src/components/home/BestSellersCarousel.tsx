@@ -1,12 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowIcon } from '@/components/icons';
-import { WishlistButton } from '@/components/product/WishlistButton';
 import { AnimateIn } from '@/components/ui/AnimateIn';
-
+import { ProductCard, type ProductCardProduct } from '@/components/product/ProductCard';
 
 type Product = {
   id: number;
@@ -18,101 +16,115 @@ type Product = {
   maxPrice: string;
 };
 
-function formatPrice(price: string) {
-  return Math.round(Number(price)).toLocaleString('es-CL');
-}
-
-function PriceDisplay({ min, max }: { min: string; max: string }) {
-  const minVal = Math.round(Number(min));
-  const maxVal = Math.round(Number(max));
-
-  if (minVal === maxVal) {
-    return <span className="text-brand-gold-dark font-medium">${formatPrice(min)}</span>;
-  }
-
-  return (
-    <span className="text-brand-gold-dark font-medium">
-      ${formatPrice(min)} — ${formatPrice(max)}
-    </span>
-  );
-}
-
-function ProductCard({ product }: { product: Product }) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div className="flex-shrink-0 w-64 sm:w-72 group relative bg-brand-white ring-1 ring-brand-beige-line hover:ring-brand-gold/40 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl">
-      {/* Botón favorito */}
-      <div className="absolute top-3 right-3 z-10">
-        <WishlistButton productId={product.id} />
-      </div>
-
-      <Link
-        href={`/producto/${product.slug}`}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        {/* Imagen */}
-        <div className="relative h-80 bg-brand-white overflow-hidden shadow-md group-hover:shadow-xl transition-shadow duration-300">
-          {product.mainImage ? (
-            <Image
-              src={hovered && product.hoverImage ? product.hoverImage : product.mainImage}
-              alt={product.name}
-              fill
-              className="object-cover transition-all duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-brand-cream">
-              <span className="text-brand-text-muted text-xs">Sin imagen</span>
-            </div>
-          )}
-          {/* Overlay sutil en hover */}
-          <div className="absolute inset-0 bg-brand-black/0 group-hover:bg-brand-black/10 transition-all duration-300" />
-        </div>
-
-        {/* Info */}
-        <div className="pt-4 pb-4 px-4">
-          <p className="text-xs text-brand-text-muted uppercase tracking-widest mb-1">Decant</p>
-          <p className="text-sm text-brand-text-dark uppercase tracking-wide font-medium group-hover:text-brand-gold-dark transition-colors">
-            {product.name}
-          </p>
-          <p className="text-sm text-brand-text-muted mt-1.5">
-            <PriceDisplay min={product.minPrice} max={product.maxPrice} />
-            <span className="text-xs text-brand-text-muted ml-1">CLP</span>
-          </p>
-        </div>
-
-        {/* Línea animada abajo */}
-        <div className="h-px bg-brand-beige-line w-0 group-hover:w-full transition-all duration-300 mt-2" />
-      </Link>
-    </div>
-  );
+function toProductCardProduct(product: Product): ProductCardProduct {
+  return {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    imageUrl: product.mainImage,
+    hoverImageUrl: product.hoverImage,
+    imageAlt: product.name,
+    minPrice: Number(product.minPrice),
+    maxPrice: Number(product.maxPrice),
+  };
 }
 
 export function BestSellersCarousel({ products }: { products: Product[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  function updateScrollState() {
+    const node = scrollRef.current;
+    if (!node) return;
+    setCanScrollLeft(node.scrollLeft > 4);
+    setCanScrollRight(node.scrollLeft + node.clientWidth < node.scrollWidth - 4);
+  }
+
+  useEffect(() => {
+    const node = scrollRef.current;
+    if (!node) return;
+
+    const frame = requestAnimationFrame(updateScrollState);
+    const timeout = window.setTimeout(updateScrollState, 300);
+    node.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timeout);
+      node.removeEventListener('scroll', updateScrollState);
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, [products.length]);
+
   if (products.length === 0) return null;
 
+  function scroll(dir: 'left' | 'right') {
+    scrollRef.current?.scrollBy({ left: dir === 'right' ? 320 : -320, behavior: 'smooth' });
+  }
+
   return (
-    <section className="w-full min-w-0 py-16 bg-brand-cream">
+    <section className="w-full min-w-0 bg-brand-white py-14 sm:py-16 lg:py-[4.5rem]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-       <AnimateIn animation="fade-up">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <h2 className="font-display italic text-3xl sm:text-4xl text-brand-text-dark">Los Más Deseados</h2>
-              <p className="text-brand-text-muted text-sm mt-1">Los decants que más eligen nuestros clientes</p>
+        <AnimateIn animation="fade-up">
+          <div className="mb-8 flex flex-col gap-5 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-xl">
+              <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-brand-gold-dark">Seleccion PG</p>
+              <h2 className="font-display italic text-3xl text-brand-text-dark sm:text-4xl">Los Mas Deseados</h2>
+              <p className="mt-2 text-sm leading-relaxed text-brand-text-muted">Los decants que mas eligen nuestros clientes.</p>
             </div>
-            <Link href="/decants" className="text-sm text-brand-text-dark hover:text-brand-gold-dark transition-colors flex items-center gap-1 flex-shrink-0">
-              Ver todos
-              <ArrowIcon className="w-4 h-4" />
-            </Link>
+            <div className="flex items-center gap-3">
+              <CarouselButton direction="left" onClick={() => scroll('left')} disabled={!canScrollLeft} label="Ver anteriores" />
+              <CarouselButton direction="right" onClick={() => scroll('right')} disabled={!canScrollRight} label="Ver siguientes" />
+              <Link href="/decants" className="ml-1 hidden items-center gap-1 text-sm text-brand-text-dark transition-colors hover:text-brand-gold-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-gold sm:flex">
+                Ver todos
+                <ArrowIcon className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </AnimateIn>
-        <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+        <div ref={scrollRef} className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide scroll-smooth sm:gap-6">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={toProductCardProduct(product)}
+              variant="carousel"
+              pricePrefix="none"
+              className="w-64 sm:w-72"
+            />
           ))}
+        </div>
+        <div className="mt-6 flex justify-center sm:hidden">
+          <Link href="/decants" className="flex items-center gap-1 text-sm text-brand-gold-dark hover:underline">
+            Ver todos los decants <ArrowIcon className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </section>
+  );
+}
+
+function CarouselButton({
+  direction,
+  onClick,
+  disabled,
+  label,
+}: {
+  direction: 'left' | 'right';
+  onClick: () => void;
+  disabled: boolean;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      className="grid h-10 w-10 place-items-center border border-brand-beige-line text-brand-text-dark transition-colors hover:border-brand-gold hover:text-brand-gold-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold disabled:cursor-not-allowed disabled:opacity-35"
+    >
+      <ArrowIcon className={`w-4 h-4 ${direction === 'left' ? 'rotate-180' : ''}`} />
+    </button>
   );
 }

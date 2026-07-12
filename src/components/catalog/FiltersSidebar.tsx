@@ -9,7 +9,9 @@ type FilterOptions = {
   seasonOptions: { id: number; name: string }[];
 };
 
-export function FiltersSidebar({ options }: { options: FilterOptions }) {
+export type { FilterOptions };
+
+export function FiltersSidebar({ options, className = '' }: { options: FilterOptions; className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -57,7 +59,7 @@ export function FiltersSidebar({ options }: { options: FilterOptions }) {
     currentGenero || currentTipo || currentMarcas.length > 0 || currentFamilias.length > 0 || currentTemporadas.length > 0;
 
   return (
-    <aside className="w-full lg:w-64 flex-shrink-0">
+    <aside className={`w-full lg:w-64 flex-shrink-0 ${className}`}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-display italic text-2xl text-brand-text-dark">Filtros</h3>
         {hasActiveFilters && (

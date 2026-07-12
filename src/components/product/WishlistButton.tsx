@@ -6,10 +6,18 @@ import { useRouter } from 'next/navigation';
 import { HeartIcon } from '@/components/icons';
 import { toggleWishlist, isProductInWishlist } from '@/app/wishlist-actions';
 
-export function WishlistButton({ productId, className }: { productId: number; className?: string }) {
+export function WishlistButton({
+  productId,
+  className,
+  initialIsInWishlist = false,
+}: {
+  productId: number;
+  className?: string;
+  initialIsInWishlist?: boolean;
+}) {
   const { data: session } = useSession();
   const router = useRouter();
-  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(initialIsInWishlist);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

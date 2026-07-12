@@ -23,20 +23,20 @@ export function TrustBadges({ badges }: { badges: Badge[] }) {
 
   return (
     <section className="border-y border-brand-beige-line bg-brand-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 md:divide-x md:divide-brand-beige-line">
+      <div className="max-w-[var(--content-max)] mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
+        <div className="grid grid-cols-2 gap-y-1 md:grid-cols-4 md:divide-x md:divide-brand-beige-line">
           {badges.map((badge, i) => {
             const Icon = iconMap[badge.icon];
             return (
-              <AnimateIn key={badge.id} delay={i * 100} animation="pop">
-                <div className="group flex flex-col items-center text-center gap-3 px-4 py-2 transition-transform duration-300 hover:-translate-y-1 cursor-default">
-                  <div className="flex items-center justify-center w-14 h-14 rounded-full border border-brand-beige-line bg-brand-cream transition-all duration-300 group-hover:bg-brand-gold group-hover:border-brand-gold group-hover:shadow-lg group-hover:shadow-brand-gold/30">
-                    <Icon className="w-6 h-6 text-brand-gold transition-colors duration-300 group-hover:text-brand-black" />
+              <AnimateIn key={badge.id} delay={i * 70} animation="fade-in">
+                <div className="group flex items-center text-left gap-3 px-3 sm:px-5 py-3 cursor-default">
+                  <div className="flex shrink-0 items-center justify-center w-9 h-9 border border-brand-beige-line bg-brand-cream transition-colors duration-300 group-hover:border-brand-gold">
+                    <Icon className="w-[18px] h-[18px] text-brand-gold-dark transition-colors duration-300 group-hover:text-brand-gold" />
                   </div>
-                  <p className="text-sm font-medium text-brand-text-dark">{badge.title}</p>
-                  {badge.subtitle && (
-                    <p className="text-xs text-brand-text-muted">{badge.subtitle}</p>
-                  )}
+                  <div className="min-w-0">
+                    <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.08em] text-brand-text-dark leading-tight">{badge.title}</p>
+                    {badge.subtitle && <p className="text-[10px] sm:text-[11px] text-brand-text-muted mt-1 leading-snug line-clamp-2">{badge.subtitle}</p>}
+                  </div>
                 </div>
               </AnimateIn>
             );

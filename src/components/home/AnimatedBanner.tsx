@@ -10,18 +10,18 @@ export function AnimatedBanner({ messages }: { messages: BannerMessage[] }) {
   const loopMessages = [...messages, ...messages];
 
   return (
-    <div className="w-full bg-brand-gold overflow-hidden py-3">
-      <div className="flex animate-marquee whitespace-nowrap">
+    <aside aria-label="Novedades" className="group w-full bg-brand-gold-dark overflow-hidden border-y border-brand-black/10 py-2">
+      <div className="flex animate-marquee-slow whitespace-nowrap group-hover:[animation-play-state:paused] motion-reduce:animate-none">
         {loopMessages.map((msg, index) => (
           <span
             key={`${msg.id}-${index}`}
-            className="text-brand-black text-sm font-medium tracking-wide uppercase flex items-center px-8"
+            className="text-brand-cream text-[10px] sm:text-[11px] font-medium tracking-[0.16em] uppercase flex items-center px-6"
           >
             {msg.message}
-            <span className="mx-8 text-brand-black/40">✦</span>
+            <span aria-hidden="true" className="mx-6 text-brand-cream/45">•</span>
           </span>
         ))}
       </div>
-    </div>
+    </aside>
   );
 }

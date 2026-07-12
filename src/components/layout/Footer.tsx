@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
 import { InstagramIcon, WhatsappIcon } from '@/components/icons';
 
 const categoryLinks = [
@@ -12,97 +12,166 @@ const categoryLinks = [
   { label: 'Nicho', href: '/decants?tipo=nicho' },
 ];
 
+const infoLinks = [
+  { label: 'Nosotros', href: '/nosotros' },
+  { label: 'Términos y políticas', href: '/terminos' },
+];
+
 export function Footer() {
   return (
     <footer className="bg-brand-black text-brand-cream">
-      {/* Newsletter */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-brand-cream/10">
-        <h3 className="font-display italic text-2xl">Suscríbete para ofertas y novedades</h3>
-        <form className="w-full md:w-auto flex flex-col gap-1">
-          <div className="flex w-full md:w-96">
-            <input
-              type="email"
-              placeholder="Pon aquí tu email"
-              className="flex-1 bg-brand-cream text-brand-text-dark px-4 py-2.5 text-sm outline-none"
-            />
-            <button
-              type="submit"
-              className="bg-brand-gold text-brand-black px-5 py-2.5 text-sm font-medium hover:bg-brand-gold-dark transition-colors cursor-pointer"
-            >
-              Entérate de todo
-            </button>
+      <div className="border-b border-brand-cream/10">
+        <div className="mx-auto grid max-w-7xl gap-7 px-4 py-10 sm:px-6 md:grid-cols-[minmax(0,0.9fr)_minmax(340px,1fr)] md:items-center lg:px-8 lg:py-12">
+          <div>
+            <p className="font-sans text-[11px] font-medium uppercase tracking-[0.24em] text-brand-gold/80">
+              Comunidad PG Decants
+            </p>
+            <h2 className="mt-3 font-display text-3xl italic leading-tight text-brand-cream sm:text-4xl">
+              Suscríbete para ofertas y novedades
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-brand-cream/62">
+              Recibe lanzamientos, recomendaciones y oportunidades especiales para descubrir tu próxima fragancia.
+            </p>
           </div>
-          <span className="text-xs text-brand-cream/50">*Acepto recibir correos promocionales</span>
-        </form>
+
+          <form className="w-full" aria-label="Suscripcion a ofertas y novedades">
+            <label htmlFor="footer-newsletter-email" className="sr-only">
+              Email para suscribirte
+            </label>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input
+                id="footer-newsletter-email"
+                type="email"
+                name="email"
+                placeholder="Pon aquí tu email"
+                autoComplete="email"
+                className="min-h-12 flex-1 border border-brand-cream/14 bg-brand-cream px-4 text-sm text-brand-text-dark outline-none transition-colors placeholder:text-brand-text-muted/70 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/30"
+              />
+              <button
+                type="submit"
+                className="min-h-12 border border-brand-gold bg-brand-gold px-6 text-sm font-medium text-brand-black transition-colors hover:bg-brand-gold-dark focus:outline-none focus:ring-2 focus:ring-brand-gold/40 focus:ring-offset-2 focus:ring-offset-brand-black"
+              >
+                Entérate de todo
+              </button>
+            </div>
+            <p className="mt-3 text-xs leading-5 text-brand-cream/50">
+              *Acepto recibir correos promocionales
+            </p>
+          </form>
+        </div>
       </div>
 
-      {/* Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
-        <div>
-          <Image
-            src="/brand/logo-horizontal-fondo-negro.png"
-            alt="P&G Decants"
-            width={160}
-            height={40}
-            className="mb-4"
-          />
-          <p className="text-sm text-brand-cream/70">Ahumada 236, of. 808, Santiago</p>
-          <p className="text-sm text-brand-cream/70 mt-2">
-            Lunes a Viernes: 10:30 – 15:00 y 16:00 – 19:00
-            <br />
-            Sábado: 10:30 – 14:30
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-11 sm:px-6 md:grid-cols-[1.25fr_0.8fr_0.8fr_0.8fr] lg:px-8">
+        <div className="max-w-sm">
+          <Link href="/" aria-label="Ir al inicio de P&G Decants">
+            <Image
+              src="/brand/logo-horizontal-fondo-negro.png"
+              alt="P&G Decants"
+              width={170}
+              height={43}
+              className="h-auto w-[150px] sm:w-[170px]"
+            />
+          </Link>
+          <p className="mt-5 text-sm leading-6 text-brand-cream/68">
+            Decants de perfumes originales de 3, 5 y 10ml con envío a todo Chile.
           </p>
-          <a href="mailto:contacto@pgdecants.cl" className="text-sm text-brand-gold block mt-2">
+          <address className="mt-5 not-italic text-sm leading-6 text-brand-cream/68">
+            Ahumada 236, of. 808, Santiago
+          </address>
+          <a
+            href="mailto:contacto@pgdecants.cl"
+            className="mt-3 inline-flex min-h-11 items-center text-sm text-brand-gold transition-colors hover:text-brand-cream focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+          >
             contacto@pgdecants.cl
           </a>
         </div>
 
-        <div>
-          <h4 className="font-medium mb-4 text-brand-gold">Categorías</h4>
-          <ul className="flex flex-col gap-2">
+        <nav aria-label="Categorias del footer">
+          <h3 className="font-sans text-xs font-medium uppercase tracking-[0.18em] text-brand-gold">
+            Categorías
+          </h3>
+          <ul className="mt-5 flex flex-col gap-2.5">
             {categoryLinks.map((link) => (
               <li key={link.label}>
-                <Link href={link.href} className="text-sm text-brand-cream/80 hover:text-brand-gold transition-colors">
+                <Link
+                  href={link.href}
+                  className="inline-flex min-h-9 items-center text-sm text-brand-cream/74 transition-colors hover:text-brand-gold focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+                >
                   {link.label}
                 </Link>
               </li>
             ))}
           </ul>
-        </div>
+        </nav>
 
-        <div>
-          <h4 className="font-medium mb-4 text-brand-gold">Información</h4>
-          <ul className="flex flex-col gap-2">
-            <li>
-              <Link href="/nosotros" className="text-sm text-brand-cream/80 hover:text-brand-gold transition-colors">
-                Nosotros
-              </Link>
-            </li>
-            <li>
-              <Link href="/terminos" className="text-sm text-brand-cream/80 hover:text-brand-gold transition-colors">
-                Términos y políticas
-              </Link>
-            </li>
+        <nav aria-label="Informacion y ayuda">
+          <h3 className="font-sans text-xs font-medium uppercase tracking-[0.18em] text-brand-gold">
+            Información
+          </h3>
+          <ul className="mt-5 flex flex-col gap-2.5">
+            {infoLinks.map((link) => (
+              <li key={link.label}>
+                <Link
+                  href={link.href}
+                  className="inline-flex min-h-9 items-center text-sm text-brand-cream/74 transition-colors hover:text-brand-gold focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
-        </div>
+          <div className="mt-7 border-t border-brand-cream/10 pt-5 text-sm leading-6 text-brand-cream/62">
+            <p>Lunes a Viernes: 10:30 - 15:00 y 16:00 - 19:00</p>
+            <p>Sábado: 10:30 - 14:30</p>
+          </div>
+        </nav>
 
         <div>
-          <h4 className="font-medium mb-4 text-brand-gold">Síguenos</h4>
-          <div className="flex gap-4">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-brand-gold transition-colors">
-              <InstagramIcon className="w-5 h-5" />
+          <h3 className="font-sans text-xs font-medium uppercase tracking-[0.18em] text-brand-gold">
+            Contacto
+          </h3>
+          <p className="mt-5 text-sm leading-6 text-brand-cream/62">
+            Escríbenos para resolver dudas sobre disponibilidad, aromas o el formato ideal para ti.
+          </p>
+          <div className="mt-5 flex gap-3">
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram de P&G Decants"
+              className="flex h-11 w-11 items-center justify-center border border-brand-cream/14 text-brand-cream/78 transition-colors hover:border-brand-gold hover:text-brand-gold focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+            >
+              <InstagramIcon className="h-5 w-5" />
             </a>
-            <a href="https://wa.me/56900000000" target="_blank" rel="noopener noreferrer" className="hover:text-brand-gold transition-colors">
-              <WhatsappIcon className="w-5 h-5" />
+            <a
+              href="https://wa.me/56900000000"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp de P&G Decants"
+              className="flex h-11 w-11 items-center justify-center border border-brand-cream/14 text-brand-cream/78 transition-colors hover:border-brand-gold hover:text-brand-gold focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+            >
+              <WhatsappIcon className="h-5 w-5" />
             </a>
           </div>
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-brand-cream/10 py-6 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-brand-cream/50">
-          <p>© {new Date().getFullYear()} P&G Decants. Decants de perfumes originales de 3, 5 y 10ml con envío a todo Chile.</p>
+      <div className="border-t border-brand-cream/10 px-4 pb-24 pt-5 sm:px-6 sm:pb-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 text-xs leading-5 text-brand-cream/48 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            © {new Date().getFullYear()} P&G Decants. Decants de perfumes originales de 3, 5 y 10ml con envío a todo Chile.
+          </p>
+          <div className="flex gap-4">
+            {infoLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="transition-colors hover:text-brand-gold focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

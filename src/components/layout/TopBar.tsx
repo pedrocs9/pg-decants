@@ -10,18 +10,21 @@ type TopBarMessage = {
 export function TopBar({ messages }: { messages: TopBarMessage[] }) {
   const [current, setCurrent] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (messages.length <= 1) return;
+    if (messages.length <= 1 || paused) return;
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % messages.length);
-    }, 4000);
+    }, 5000);
     return () => clearInterval(interval);
-  }, [messages.length]);
+  }, [messages.length, paused]);
 
   useEffect(() => {
     function handleScroll() {
-      setScrolled(window.scrollY > 12);
+      const nextScrolled = window.scrollY > 12;
+      setScrolled(nextScrolled);
+      window.dispatchEvent(new CustomEvent('pg-header-scroll', { detail: nextScrolled }));
     }
     window.addEventListener('scroll', handleScroll);
     handleScroll();
@@ -34,28 +37,35 @@ export function TopBar({ messages }: { messages: TopBarMessage[] }) {
   const goNext = () => setCurrent((prev) => (prev + 1) % messages.length);
 
   return (
-    <div
-      className={`fixed top-0 inset-x-0 z-50 bg-brand-cream text-brand-text-dark text-sm h-10 flex items-center justify-center px-12 border-b border-brand-beige-line transition-transform duration-300 ${
+    <aside
+      aria-label="Información de la tienda"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+      className={`fixed top-0 inset-x-0 z-50 bg-brand-cream text-brand-text-dark h-[var(--topbar-height)] flex items-center justify-center px-11 border-b border-brand-beige-line transition-transform duration-[var(--transition-standard)] motion-reduce:transition-none ${
         scrolled ? '-translate-y-full' : 'translate-y-0'
       }`}
     >
       <button
         onClick={goPrev}
         aria-label="Mensaje anterior"
-        className="absolute left-4 cursor-pointer hover:text-brand-gold-dark transition-colors"
+        className="absolute left-3 sm:left-5 grid h-8 w-8 place-items-center text-lg cursor-pointer hover:text-brand-gold-dark focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-gold-dark transition-colors"
       >
         ‹
       </button>
 
-      <span className="font-body text-center px-2">{messages[current].message}</span>
+      <span key={messages[current].id} className="font-body text-[10px] sm:text-[11px] uppercase tracking-[0.12em] text-center px-2 line-clamp-1 animate-[fade-in_0.35s_ease] motion-reduce:animate-none">
+        {messages[current].message}
+      </span>
 
       <button
         onClick={goNext}
         aria-label="Mensaje siguiente"
-        className="absolute right-4 cursor-pointer hover:text-brand-gold-dark transition-colors"
+        className="absolute right-3 sm:right-5 grid h-8 w-8 place-items-center text-lg cursor-pointer hover:text-brand-gold-dark focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-gold-dark transition-colors"
       >
         ›
       </button>
-    </div>
+    </aside>
   );
 }
