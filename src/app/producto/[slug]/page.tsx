@@ -49,6 +49,12 @@ const typeLabels: Record<string, string> = {
   nicho: 'Nicho',
 };
 
+function getDescriptionExcerpt(description: string) {
+  const normalized = description.trim();
+  if (normalized.length <= 220) return normalized;
+  return `${normalized.slice(0, 220).trim()}...`;
+}
+
 export default async function ProductPage({
   params,
 }: {
@@ -74,36 +80,71 @@ export default async function ProductPage({
       <TopBar messages={messages} />
       <Header />
 
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
-        {/* Breadcrumb simple */}
-        <p className="text-xs text-brand-text-muted mb-8">
-          Decants / {typeLabels[product.perfumeType]} / {product.name}
-        </p>
+      <div className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+        <nav aria-label="Breadcrumb" className="mb-6 text-xs text-brand-text-muted sm:mb-8">
+          <ol className="flex flex-wrap items-center gap-2">
+            <li>Decants</li>
+            <li aria-hidden="true">/</li>
+            <li>{typeLabels[product.perfumeType]}</li>
+            <li aria-hidden="true">/</li>
+            <li className="text-brand-text-dark">{product.name}</li>
+          </ol>
+        </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(380px,0.85fr)] lg:gap-12 xl:gap-16">
           <ProductGallery images={product.images} productName={product.name} />
 
-          <div>
-               <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm text-brand-text-muted uppercase tracking-wide mb-1">{product.brandName}</p>
-                <h1 className="font-display italic text-4xl text-brand-text-dark mb-4">{product.name}</h1>
+          <section className="lg:sticky lg:top-[calc(var(--topbar-height)+76px+24px)] lg:self-start">
+            <div className="border border-brand-beige-line bg-brand-cream/45 px-5 py-6 sm:px-7 sm:py-8 lg:px-8">
+              <div className="flex items-start justify-between gap-5">
+                <div className="min-w-0">
+                  {product.brandName && (
+                    <p className="mb-2 font-sans text-xs font-medium uppercase tracking-[0.2em] text-brand-gold-dark">
+                      {product.brandName}
+                    </p>
+                  )}
+                  <h1 className="font-display text-4xl italic leading-[0.95] text-brand-text-dark sm:text-5xl lg:text-6xl">
+                    {product.name}
+                  </h1>
+                </div>
+                <WishlistButton
+                  productId={product.id}
+                  className="grid min-h-11 min-w-11 place-items-center border border-brand-beige-line bg-brand-white text-brand-text-dark hover:border-brand-gold hover:text-brand-gold-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                />
               </div>
-              <WishlistButton productId={product.id} className="mt-2" />
+
+              {product.dupeOf && (
+                <p className="mt-4 text-sm italic text-brand-gold-dark">{product.dupeOf}</p>
+              )}
+
+              {product.description && (
+                <div id="descripcion-fragancia" className="mt-5 border-t border-brand-beige-line pt-5">
+                  <p className="line-clamp-4 text-sm leading-7 text-brand-text-muted">
+                    {getDescriptionExcerpt(product.description)}
+                  </p>
+                  <a
+                    href="#descripcion-fragancia"
+                    className="mt-3 inline-flex text-xs font-medium uppercase tracking-[0.16em] text-brand-gold-dark transition-colors hover:text-brand-text-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-gold"
+                  >
+                    Conocer la fragancia
+                  </a>
+                </div>
+              )}
+
+              <div className="mt-7">
+                <VariantSelector variants={product.variants} />
+              </div>
             </div>
+          </section>
+        </div>
 
-            {product.dupeOf && (
-              <p className="text-sm text-brand-gold-dark mb-4 italic">{product.dupeOf}</p>
-            )}
-
-            {product.description && (
-              <p className="text-sm text-brand-text-muted leading-relaxed mb-6">{product.description}</p>
-            )}
-
-            <VariantSelector variants={product.variants} />
-
-            {/* Info adicional */}
-            <div className="mt-8 pt-8 border-t border-brand-beige-line grid grid-cols-2 gap-y-3 text-sm">
+        {/* Info adicional */}
+        <section className="mt-12 border-t border-brand-beige-line pt-8 lg:mt-16">
+          <h2 className="mb-6 font-display text-3xl italic text-brand-text-dark">
+            Detalles de la fragancia
+          </h2>
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,0.65fr)_minmax(0,1fr)]">
+            <div className="grid grid-cols-2 gap-y-3 text-sm">
               <span className="text-brand-text-muted">Género</span>
               <span className="text-brand-text-dark">{genderLabels[product.gender]}</span>
 
@@ -112,28 +153,30 @@ export default async function ProductPage({
 
               <span className="text-brand-text-muted">Tipo</span>
               <span className="text-brand-text-dark">{typeLabels[product.perfumeType]}</span>
+            </div>
 
-             {product.families.length > 0 && (
-                <div className="flex items-start gap-4 py-3 border-b border-brand-beige-line">
-                  <span className="text-xs text-brand-gold-dark uppercase tracking-wide w-32 flex-shrink-0 pt-1.5">Familia Olfativa</span>
+            <div className="space-y-4">
+              {product.families.length > 0 && (
+                <div className="flex flex-col gap-3 border-b border-brand-beige-line pb-4 sm:flex-row sm:items-start">
+                  <span className="w-36 flex-shrink-0 text-xs uppercase tracking-wide text-brand-gold-dark">Familia Olfativa</span>
                   <FamilyChips families={product.families} />
                 </div>
               )}
               {product.notes.length > 0 && (
-                <div className="flex items-start gap-4 py-3 border-b border-brand-beige-line">
-                  <span className="text-xs text-brand-gold-dark uppercase tracking-wide w-32 flex-shrink-0 pt-1.5">Notas</span>
+                <div className="flex flex-col gap-3 border-b border-brand-beige-line pb-4 sm:flex-row sm:items-start">
+                  <span className="w-36 flex-shrink-0 text-xs uppercase tracking-wide text-brand-gold-dark">Notas</span>
                   <NoteChips notes={product.notes} />
                 </div>
               )}
               {product.seasons.length > 0 && (
-                <div className="flex items-start gap-4 py-3 border-b border-brand-beige-line">
-                  <span className="text-xs text-brand-gold-dark uppercase tracking-wide w-32 flex-shrink-0 pt-1.5">Temporada</span>
+                <div className="flex flex-col gap-3 border-b border-brand-beige-line pb-4 sm:flex-row sm:items-start">
+                  <span className="w-36 flex-shrink-0 text-xs uppercase tracking-wide text-brand-gold-dark">Temporada</span>
                   <SeasonChips seasons={product.seasons} />
                 </div>
               )}
             </div>
           </div>
-        </div>
+        </section>
 
         <ProductReviews productId={product.id} />
         {/* Relacionados */}

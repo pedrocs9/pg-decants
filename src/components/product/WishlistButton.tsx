@@ -40,11 +40,11 @@ export function WishlistButton({ productId, className }: { productId: number; cl
       onClick={handleClick}
       disabled={loading}
       aria-label={isInWishlist ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-      className={`cursor-pointer transition-transform hover:scale-110 ${className}`}
+      className={`cursor-pointer transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
     >
        <HeartIcon
         className={`w-5 h-5 transition-colors ${
-          isInWishlist ? 'text-brand-gold [&_path]:fill-current [&_path]:fill-opacity-100' : 'text-brand-text-dark'
+          isInWishlist ? 'text-brand-gold [&_path]:fill-current [&_path]:fill-opacity-100' : 'text-current'
         }`}
       />
     </button>
